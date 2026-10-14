@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: office-jukebox
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn jukebox.wsgi:application"
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: NUM_PROXIES
+        value: "1"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"

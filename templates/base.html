@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Office Jukebox - Shared Office Music Queue{% endblock %}</title>
+  {% block extra_meta %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-container">
+      <a href="{% url 'welcome' %}" class="brand">
+        <span class="brand-icon">📻</span>
+        <span class="brand-title">Office Jukebox</span>
+      </a>
+
+      <div class="header-meta">
+        {% if current_room_code %}
+          <div class="pill-badge code" id="copy-room-code-btn" title="Click to copy Room Code">
+            <span>Room: <strong>{{ current_room_code }}</strong></span>
+            <span style="font-size: 0.75rem;">📋</span>
+          </div>
+
+          <div class="pill-badge" id="speaker-status-badge">
+            <span class="status-dot offline"></span>
+            <span>Speaker Idle</span>
+          </div>
+
+          <div class="pill-badge" id="online-count-badge">
+            <span>1 online</span>
+          </div>
+
+          <div class="pill-badge">
+            <span>👤 <strong>{{ user_display_name|default:"Employee" }}</strong></span>
+          </div>
+
+          <a href="{% url 'player' room_code=current_room_code %}" target="_blank" class="btn btn-secondary btn-sm" title="Open designated speaker screen">
+            🔊 Player Mode
+          </a>
+
+          <a href="{% url 'moderator' room_code=current_room_code %}" class="btn btn-secondary btn-sm" title="Room settings & moderation">
+            ⚙️ Moderator
+          </a>
+
+          <a href="{% url 'leave_room' %}" class="btn btn-icon btn-sm" title="Leave room">
+            🚪
+          </a>
+        {% else %}
+          <span class="pill-badge">
+            <span>🌐 Office Net: <strong>{{ client_ip_masked }}</strong></span>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% if messages %}
+    <div style="max-width: 1380px; margin: 1rem auto 0; padding: 0 1.5rem;">
+      {% for message in messages %}
+        <div class="toast {{ message.tags }}" style="position: static; margin-bottom: 0.5rem; max-width: 100%;">
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="app-footer">
+    <p>Office Jukebox &bull; Fair-play office music democracy &bull; Powered by YouTube Data API &amp; Django</p>
+  </footer>
+
+  <div class="toast-container"></div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

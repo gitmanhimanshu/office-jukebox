@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ room.name }} - Office Jukebox{% endblock %}
+
+{% block extra_meta %}
+  <meta name="room-code" content="{{ room.code }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+
+  <!-- Left Column: Search & Add Songs -->
+  <div>
+    <!-- Search Card -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <div class="card-header">
+        <h2 class="card-title">🔍 Search &amp; Add Music</h2>
+        <span id="search-spinner" style="display: none; font-size: 0.85rem; color: var(--primary);">
+          Searching...
+        </span>
+      </div>
+
+      <div class="search-container">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔎</span>
+          <input
+            type="text"
+            id="search-input"
+            class="form-control search-input"
+            placeholder="Search song title, artist, or paste YouTube URL..."
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <!-- Search Results Container -->
+      <div id="search-results" class="search-results">
+        <div class="empty-state" style="padding: 1.5rem 1rem;">
+          <p>Type a song title or artist above to find tracks on YouTube.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fair-Play Room Policy Card -->
+    <div class="card" style="background: var(--bg-surface-alt);">
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+        ⚖️ Active Fair-Play Rules
+      </h3>
+      <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;">
+        <div>&bull; Max active songs per employee: <strong>{{ settings.max_active_songs_per_user }}</strong></div>
+        <div>&bull; Queue cooldown between requests: <strong>{{ settings.user_song_cooldown_seconds }}s</strong></div>
+        <div>&bull; Fair-turn mode: <strong>{% if settings.fair_turn_mode %}Enabled (Tied votes prioritize users with fewer recent plays){% else %}Standard FIFO on tied votes{% endif %}</strong></div>
+        <div>&bull; One vote per person per track (click vote again to retract).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Currently Playing & Shared Queue -->
+  <div>
+    <!-- Currently Playing Card -->
+    <div class="card now-playing-card" style="margin-bottom: 1.5rem;">
+      <div class="card-header" style="border-bottom-color: rgba(99, 102, 241, 0.2);">
+        <h2 class="card-title">
+          <span>🎧 Now Playing</span>
+          <div class="equalizer" id="now-playing-equalizer" style="display: none;">
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+            <div class="eq-bar"></div>
+          </div>
+        </h2>
+        {% if is_moderator %}
+          <button id="dashboard-skip-btn" class="btn btn-danger btn-sm" title="Skip current track">
+            ⏭ Skip Song
+          </button>
+        {% endif %}
+      </div>
+
+      <!-- Active Track Info -->
+      <div id="now-playing-active" class="track-hero" style="display: none;">
+        <div class="track-thumbnail-wrap">
+          <img id="now-playing-thumb" src="" alt="Album Art" class="track-thumbnail" />
+        </div>
+        <div class="track-info">
+          <div class="track-title" id="now-playing-title">-</div>
+          <div class="track-channel" id="now-playing-channel">-</div>
+          <div class="track-added-by" id="now-playing-added-by">-</div>
+        </div>
+      </div>
+
+      <!-- Idle Track Empty State -->
+      <div id="now-playing-empty" class="empty-state" style="padding: 1rem 0;">
+        <div class="empty-icon">📻</div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Office Speaker is Idle</h3>
+        <p style="font-size: 0.85rem;">Add a song from the search bar to start the music!</p>
+      </div>
+    </div>
+
+    <!-- Shared Queue Card -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span>📋 Shared Queue</span>
+          <span class="pill-badge" id="queue-count-badge" style="font-size: 0.75rem;">
+            0 in queue
+          </span>
+        </h2>
+        <span style="font-size: 0.75rem; color: var(--text-dim);">Live Sync</span>
+      </div>
+
+      <div id="queue-items-container" class="queue-list">
+        <!-- Rendered via JavaScript polling -->
+        <div class="empty-state">
+          <div class="empty-icon">🎵</div>
+          <h3>Queue is Empty</h3>
+          <p>Search for your favorite track and add it to the shared office queue!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Video Preview Modal -->
+<div id="preview-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="font-size: 1rem; font-weight: 700;">Video Preview</h3>
+      <button id="preview-close-btn" class="btn btn-icon btn-sm" title="Close preview">✕</button>
+    </div>
+    <div class="modal-body" style="padding: 0;">
+      <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000;">
+        <iframe
+          id="preview-iframe"
+          style="width: 100%; height: 100%; border: none;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/app.js' %}"></script>
+{% endblock %}

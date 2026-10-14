@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Moderator Panel - {{ room.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 980px; margin: 1.5rem auto;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+    <div>
+      <h1 style="font-size: 1.75rem; font-weight: 800;">⚙️ Moderator Panel</h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Manage {{ room.name }} (Room Code: <code>{{ room.code }}</code>)
+      </p>
+    </div>
+    <a href="{% url 'dashboard' room_code=room.code %}" class="btn btn-secondary">
+      ← Return to Dashboard
+    </a>
+  </div>
+
+  {% if not is_moderator %}
+    <!-- PIN Challenge Form -->
+    <div class="card" style="max-width: 480px; margin: 3rem auto; padding: 2rem;">
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">🔒 Moderator Authorization</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        This room is protected by a moderator PIN. Enter the PIN below to access queue management and room settings.
+      </p>
+
+      <form method="post" action="{% url 'moderator' room_code=room.code %}">
+        {% csrf_token %}
+        <input type="hidden" name="claim_moderator" value="1">
+
+        {% if pin_form.errors %}
+          <div class="toast error" style="margin-bottom: 1rem; width: 100%;">
+            {% for field, errors in pin_form.errors.items %}
+              <span>{{ errors|striptags }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="{{ pin_form.pin.id_for_label }}">Moderator PIN</label>
+          {{ pin_form.pin }}
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+          Unlock Moderator Panel
+        </button>
+      </form>
+    </div>
+  {% else %}
+    <!-- Authorized Moderator View -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+
+      <!-- Settings Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">⚖️ Queue &amp; Fairness Rules</h2>
+        </div>
+
+        <form method="post" action="{% url 'moderator' room_code=room.code %}">
+          {% csrf_token %}
+          <input type="hidden" name="update_settings" value="1">
+
+          <div class="form-group">
+            <label class="form-label" for="{{ settings_form.max_active_songs_per_user.id_for_label }}">
+              Max Active Songs per Employee
+            </label>
+            {{ settings_form.max_active_songs_per_user }}
+            <div class="form-hint">Prevents any single employee from monopolizing the queue.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ settings_form.user_song_cooldown_seconds.id_for_label }}">
+              Song Addition Cooldown (Seconds)
+            </label>
+            {{ settings_form.user_song_cooldown_seconds }}
+            <div class="form-hint">Time an employee must wait before adding their next song.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ settings_form.poll_interval_ms.id_for_label }}">
+              Sync Polling Interval (Milliseconds)
+            </label>
+            {{ settings_form.poll_interval_ms }}
+            <div class="form-hint">Default 3000ms. Lower values increase responsiveness; higher saves server load.</div>
+          </div>
+
+          <div class="form-group" style="display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem;">
+            {{ settings_form.fair_turn_mode }}
+            <label for="{{ settings_form.fair_turn_mode.id_for_label }}" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+              Enable Fair-Turn Tie-Breaker
+            </label>
+          </div>
+          <div class="form-hint" style="margin-top: -0.5rem; margin-bottom: 1rem;">
+            When songs have identical vote scores, prioritize songs from employees who have had fewer recent plays.
+          </div>
+
+          <div class="form-group" style="display: flex; align-items: center; gap: 0.75rem;">
+            {{ settings_form.auto_advance }}
+            <label for="{{ settings_form.auto_advance.id_for_label }}" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+              Auto-Advance Track
+            </label>
+          </div>
+
+          <div style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              Save Settings
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Active Employees in Room -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">👥 Connected Colleagues</h2>
+          <span class="pill-badge">{{ active_participants.count }} active</span>
+        </div>
+
+        {% if active_participants %}
+          <div style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 380px; overflow-y: auto;">
+            {% for p in active_participants %}
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 0.85rem; background: var(--bg-surface-alt); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div>
+                  <div style="font-weight: 600; font-size: 0.9rem;">
+                    {{ p.display_name }}
+                    {% if p.is_moderator %}
+                      <span class="pill-badge warning" style="font-size: 0.65rem; padding: 0.15rem 0.4rem;">Mod</span>
+                    {% endif %}
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-dim);">
+                    Active {{ p.last_seen|timesince }} ago
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state" style="padding: 1.5rem 0;">
+            <p>No active participants in the last 15 minutes.</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Audit Log -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">📜 Moderation &amp; Activity Audit Log</h2>
+      </div>
+
+      {% if audit_logs %}
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-subtle); color: var(--text-dim);">
+                <th style="padding: 0.6rem 0.85rem;">Time</th>
+                <th style="padding: 0.6rem 0.85rem;">Actor</th>
+                <th style="padding: 0.6rem 0.85rem;">Action</th>
+                <th style="padding: 0.6rem 0.85rem;">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in audit_logs %}
+                <tr style="border-bottom: 1px solid var(--border-subtle);">
+                  <td style="padding: 0.6rem 0.85rem; white-space: nowrap; color: var(--text-dim);">
+                    {{ log.created_at|date:"M d, H:i:s" }}
+                  </td>
+                  <td style="padding: 0.6rem 0.85rem; font-weight: 600;">{{ log.actor_name }}</td>
+                  <td style="padding: 0.6rem 0.85rem;">
+                    <span class="pill-badge" style="font-size: 0.72rem;">{{ log.action }}</span>
+                  </td>
+                  <td style="padding: 0.6rem 0.85rem; color: var(--text-muted);">{{ log.details }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state" style="padding: 1.5rem 0;">
+          <p>No recorded audit events yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

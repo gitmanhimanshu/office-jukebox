@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Office Jukebox{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 2rem auto;">
+  <div class="card" style="padding: 2.5rem; text-align: center;">
+    <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">📻🎶</div>
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.02em;">
+      Office Jukebox
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 2rem;">
+      End the office music fights. A democratic, fair-play shared queue for everyone in the workspace.
+    </p>
+
+    <!-- Detected Network Status Banner -->
+    <div style="background: var(--bg-surface-alt); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.75rem; text-align: left; display: flex; align-items: center; gap: 1rem;">
+      <div style="font-size: 2rem;">🌐</div>
+      <div style="flex: 1;">
+        <div style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
+          Office Network Detected
+        </div>
+        <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">
+          Network IP: {{ client_ip_masked }}
+        </div>
+        {% if detected_room %}
+          <div style="font-size: 0.82rem; color: var(--accent-emerald); margin-top: 0.2rem;">
+            ✓ Existing Room Found: <strong>{{ detected_room.name }}</strong> (Code: <code>{{ detected_room.code }}</code>)
+          </div>
+        {% else %}
+          <div style="font-size: 0.82rem; color: var(--secondary); margin-top: 0.2rem;">
+            ℹ️ No room found on this IP yet. A shared office room will be initialized for your team.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Onboarding Form -->
+    <form method="post" action="{% url 'welcome' %}" style="text-align: left;">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="toast error" style="margin-bottom: 1.25rem; width: 100%; max-width: 100%;">
+          {% for field, errors in form.errors.items %}
+            <span>{{ errors|striptags }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.display_name.id_for_label }}">
+          {{ form.display_name.label }} <span style="color: var(--accent-rose);">*</span>
+        </label>
+        {{ form.display_name }}
+        <div class="form-hint">This name will be visible to colleagues when you add songs and vote.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.room_code.id_for_label }}">
+          {{ form.room_code.label }}
+        </label>
+        {{ form.room_code }}
+        <div class="form-hint">
+          Leave blank to auto-join everyone on your current office network, or enter a specific room code.
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+          🚀 Join Office Jukebox
+        </button>
+        <a href="{% url 'create_room' %}" class="btn btn-secondary" style="width: 100%;">
+          ➕ Create a Custom Room
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- How it Works Walkthrough Cards -->
+  <div style="margin-top: 2.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+    <div class="card" style="padding: 1.25rem;">
+      <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔍</div>
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">1. Search &amp; Add</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">
+        Search millions of tracks via YouTube API without audio extraction.
+      </p>
+    </div>
+
+    <div class="card" style="padding: 1.25rem;">
+      <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🗳️</div>
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">2. Vote &amp; Fair Play</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">
+        Vote up favorites. Fair-turn cooldowns prevent playlist monopolization.
+      </p>
+    </div>
+
+    <div class="card" style="padding: 1.25rem;">
+      <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔊</div>
+      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">3. Office Speaker</h3>
+      <p style="font-size: 0.8rem; color: var(--text-muted);">
+        Connect one PC to the speaker in Player Mode. Songs stream seamlessly.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

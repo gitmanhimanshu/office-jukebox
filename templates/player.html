@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ room.name }} - Office Speaker Player</title>
+  <meta name="room-code" content="{{ room.code }}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔊</text></svg>">
+  <style>
+    .player-queue-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg-surface-alt);
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.5rem;
+    }
+    .pq-rank {
+      font-weight: 700;
+      color: var(--accent-amber);
+      font-size: 0.85rem;
+    }
+    .pq-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .pq-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pq-by {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .empty-hint {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body class="player-page">
+
+  <!-- Player Header -->
+  <header class="player-header">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span style="font-size: 1.5rem;">🔊</span>
+      <div>
+        <h1 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">
+          Office Jukebox Player
+        </h1>
+        <div style="font-size: 0.8rem; color: var(--text-dim);">
+          {{ room.name }} &bull; Main Speaker Output
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <div class="pill-badge code" style="font-size: 0.95rem; padding: 0.4rem 1rem;">
+        Room Code: <strong>{{ room.code }}</strong>
+      </div>
+      <div class="pill-badge active">
+        <span class="status-dot online"></span>
+        <span>Speaker Mode Active</span>
+      </div>
+      <a href="{% url 'dashboard' room_code=room.code %}" class="btn btn-secondary btn-sm">
+        Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Stage -->
+  <main class="player-main-stage">
+
+    <!-- Left Stage: Video Player -->
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div class="video-frame-container">
+        <!-- Autoplay interaction overlay -->
+        <div id="player-start-overlay" class="player-autoplay-prompt">
+          <div style="font-size: 3rem;">🎵</div>
+          <h2 style="font-size: 1.5rem; font-weight: 700;">Initialize Speaker Playback</h2>
+          <p style="color: var(--text-muted); max-width: 440px; font-size: 0.95rem;">
+            Web browsers require one user interaction to authorize audio playback on office speakers.
+          </p>
+          <button id="start-playback-btn" class="btn btn-primary btn-lg">
+            ▶️ Start Office Jukebox Playback
+          </button>
+        </div>
+
+        <!-- YouTube API IFrame Target -->
+        <div id="youtube-player-element"></div>
+      </div>
+
+      <!-- Player Track Info Bar -->
+      <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem;">
+        <div style="flex: 1; min-width: 0;">
+          <h2 id="player-track-title" style="font-size: 1.2rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Connecting to Office Queue...
+          </h2>
+          <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.25rem; font-size: 0.85rem; color: var(--text-muted);">
+            <span id="player-track-channel">Waiting for playback initialization</span>
+            <span id="player-track-addedby" style="color: var(--secondary);"></span>
+          </div>
+        </div>
+
+        <div>
+          <button id="player-skip-btn" class="btn btn-danger" title="Skip to next song">
+            ⏭ Skip Song
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Stage: Upcoming Songs -->
+    <div class="card" style="display: flex; flex-direction: column; max-height: calc(100vh - 120px);">
+      <div class="card-header">
+        <h3 class="card-title">⏭ Up Next</h3>
+        <span style="font-size: 0.75rem; color: var(--text-dim);">Live Priority</span>
+      </div>
+
+      <ul id="player-up-next-list" style="list-style: none; overflow-y: auto; flex: 1; margin: 0; padding: 0;">
+        <li class="empty-hint">Waiting for upcoming songs in queue...</li>
+      </ul>
+
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); text-align: center;">
+        <div style="font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.35rem;">
+          Connect your device &amp; add songs:
+        </div>
+        <div style="font-family: monospace; font-size: 0.9rem; font-weight: 700; color: var(--secondary);">
+          Code: {{ room.code }}
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="{% static 'js/player.js' %}"></script>
+</body>
+</html>

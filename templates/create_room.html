@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Create Custom Room - Office Jukebox{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 2rem auto;">
+  <div class="card" style="padding: 2.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+      <a href="{% url 'welcome' %}" class="btn btn-icon btn-sm" title="Back to Welcome">←</a>
+      <h1 style="font-size: 1.5rem; font-weight: 700;">Create Custom Office Room</h1>
+    </div>
+
+    <form method="post" action="{% url 'create_room' %}">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="toast error" style="margin-bottom: 1.25rem; width: 100%; max-width: 100%;">
+          {% for field, errors in form.errors.items %}
+            <span>{{ errors|striptags }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.name.id_for_label }}">
+          {{ form.name.label }} <span style="color: var(--accent-rose);">*</span>
+        </label>
+        {{ form.name }}
+        <div class="form-hint">E.g., "Engineering Floor 4" or "Creative Suite".</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.moderator_pin.id_for_label }}">
+          {{ form.moderator_pin.label }}
+        </label>
+        {{ form.moderator_pin }}
+        <div class="form-hint">Optional PIN to lock settings and song skips to moderators only.</div>
+      </div>
+
+      <div class="form-group" style="display: flex; align-items: flex-start; gap: 0.75rem; margin-top: 1.5rem; background: var(--bg-surface-alt); padding: 1rem; border-radius: var(--radius-md);">
+        {{ form.bind_to_my_ip }}
+        <div>
+          <label for="{{ form.bind_to_my_ip.id_for_label }}" style="font-size: 0.88rem; font-weight: 600; cursor: pointer;">
+            Bind to current office network ({{ client_ip_masked }})
+          </label>
+          <div class="form-hint">
+            If checked, any employee browsing from this office network will automatically enter this room.
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+          Create Room &amp; Launch
+        </button>
+        <a href="{% url 'welcome' %}" class="btn btn-secondary">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
