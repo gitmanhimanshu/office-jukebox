@@ -390,7 +390,8 @@
       btn.addEventListener("click", () => {
         const videoId = btn.getAttribute("data-video-id");
         if (videoId && previewModal && previewIframe) {
-          previewIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+          const origin = encodeURIComponent(window.location.origin);
+          previewIframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1&origin=${origin}&widget_referrer=${origin}`;
           previewModal.classList.add("active");
         }
       });

@@ -63,13 +63,17 @@
     player = new YT.Player("youtube-player-element", {
       height: "100%",
       width: "100%",
+      host: "https://www.youtube-nocookie.com",
       playerVars: {
         autoplay: 0,
         controls: 1,
         rel: 0,
+        enablejsapi: 1,
+        playsinline: 1,
         modestbranding: 1,
         iv_load_policy: 3,
         origin: window.location.origin,
+        widget_referrer: window.location.href,
       },
       events: {
         onReady: onPlayerReady,

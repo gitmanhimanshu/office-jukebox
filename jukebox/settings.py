@@ -164,13 +164,16 @@ else:
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "").strip()
 
 # Reverse proxy & IP detection settings
-# When hosted behind reverse proxies (Render, AWS ALB, Cloudflare, NGINX),
+# When hosted behind reverse proxies (Render, AWS ALB, Cloudflare, NGINX, ngrok),
 # specify how many proxy hops to trust when parsing X-Forwarded-For.
 NUM_PROXIES = int(os.getenv("NUM_PROXIES", "1"))
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Referrer Policy for YouTube Embeds & API
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Production security headers
 if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
