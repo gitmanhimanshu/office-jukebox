@@ -3,33 +3,38 @@
 {% block title %}Welcome - Office Jukebox{% endblock %}
 
 {% block content %}
-<div style="max-width: 680px; margin: 2rem auto;">
-  <div class="card" style="padding: 2.5rem; text-align: center;">
-    <div style="font-size: 3.5rem; margin-bottom: 0.5rem;">📻🎶</div>
-    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.02em;">
-      Office Jukebox
+<div style="max-width: 720px; margin: 2rem auto;">
+  <div class="welcome-hero-card">
+    <div class="hero-music-badge">
+      🎵
+    </div>
+
+    <h1 class="hero-headline">
+      Office Music Democracy
     </h1>
-    <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 2rem;">
-      End the office music fights. A democratic, fair-play shared queue for everyone in the workspace.
+    <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; max-width: 540px; margin: 0 auto 2.5rem;">
+      Never argue over the office speaker again. Connect to the shared workspace queue, vote for your favorites, and enjoy harmonious music all day.
     </p>
 
-    <!-- Detected Network Status Banner -->
-    <div style="background: var(--bg-surface-alt); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.75rem; text-align: left; display: flex; align-items: center; gap: 1rem;">
-      <div style="font-size: 2rem;">🌐</div>
+    <!-- Detected Office Network Banner -->
+    <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border-glow); border-radius: var(--radius-md); padding: 1.15rem 1.4rem; margin-bottom: 2rem; text-align: left; display: flex; align-items: center; gap: 1.25rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+      <div style="width: 44px; height: 44px; border-radius: var(--radius-sm); background: rgba(99, 102, 241, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;">
+        🌐
+      </div>
       <div style="flex: 1;">
-        <div style="font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">
+        <div style="font-size: 0.75rem; color: var(--primary-light); text-transform: uppercase; font-weight: 700; letter-spacing: 0.06em;">
           Office Network Detected
         </div>
-        <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">
-          Network IP: {{ client_ip_masked }}
+        <div style="font-size: 1rem; font-weight: 700; color: #fff; margin-top: 0.1rem;">
+          Public Network: {{ client_ip_masked }}
         </div>
         {% if detected_room %}
-          <div style="font-size: 0.82rem; color: var(--accent-emerald); margin-top: 0.2rem;">
-            ✓ Existing Room Found: <strong>{{ detected_room.name }}</strong> (Code: <code>{{ detected_room.code }}</code>)
+          <div style="font-size: 0.85rem; color: var(--emerald); margin-top: 0.25rem; font-weight: 600;">
+            ✓ Active Room Found: <strong>{{ detected_room.name }}</strong> (Code: <code style="color: #a5b4fc;">{{ detected_room.code }}</code>)
           </div>
         {% else %}
-          <div style="font-size: 0.82rem; color: var(--secondary); margin-top: 0.2rem;">
-            ℹ️ No room found on this IP yet. A shared office room will be initialized for your team.
+          <div style="font-size: 0.82rem; color: var(--cyan); margin-top: 0.25rem;">
+            ℹ️ A dedicated shared room will automatically initialize for everyone on your network.
           </div>
         {% endif %}
       </div>
@@ -40,7 +45,7 @@
       {% csrf_token %}
 
       {% if form.errors %}
-        <div class="toast error" style="margin-bottom: 1.25rem; width: 100%; max-width: 100%;">
+        <div class="toast error" style="margin-bottom: 1.5rem; width: 100%; max-width: 100%;">
           {% for field, errors in form.errors.items %}
             <span>{{ errors|striptags }}</span>
           {% endfor %}
@@ -48,57 +53,59 @@
       {% endif %}
 
       <div class="form-group">
-        <label class="form-label" for="{{ form.display_name.id_for_label }}">
-          {{ form.display_name.label }} <span style="color: var(--accent-rose);">*</span>
+        <label class="form-label" for="{{ form.display_name.id_for_label }}" style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">
+          {{ form.display_name.label }} <span style="color: var(--rose);">*</span>
         </label>
         {{ form.display_name }}
-        <div class="form-hint">This name will be visible to colleagues when you add songs and vote.</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="{{ form.room_code.id_for_label }}">
-          {{ form.room_code.label }}
-        </label>
-        {{ form.room_code }}
-        <div class="form-hint">
-          Leave blank to auto-join everyone on your current office network, or enter a specific room code.
+        <div class="form-hint" style="color: var(--text-dim);">
+          Your name displayed to teammates when you add songs and vote.
         </div>
       </div>
 
-      <div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem;">
-        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
-          🚀 Join Office Jukebox
+      <div class="form-group" style="margin-top: 1.25rem;">
+        <label class="form-label" for="{{ form.room_code.id_for_label }}" style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">
+          {{ form.room_code.label }}
+        </label>
+        {{ form.room_code }}
+        <div class="form-hint" style="color: var(--text-dim);">
+          Leave blank to auto-join colleagues on your office Wi-Fi, or enter a specific room code.
+        </div>
+      </div>
+
+      <div style="margin-top: 2.25rem; display: flex; flex-direction: column; gap: 0.85rem;">
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; font-size: 1.1rem; letter-spacing: -0.01em;">
+          🚀 Enter Office Jukebox
         </button>
-        <a href="{% url 'create_room' %}" class="btn btn-secondary" style="width: 100%;">
+        <a href="{% url 'create_room' %}" class="btn btn-secondary" style="width: 100%; padding: 0.75rem;">
           ➕ Create a Custom Room
         </a>
       </div>
     </form>
   </div>
 
-  <!-- How it Works Walkthrough Cards -->
-  <div style="margin-top: 2.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
-    <div class="card" style="padding: 1.25rem;">
-      <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔍</div>
-      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">1. Search &amp; Add</h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">
-        Search millions of tracks via YouTube API without audio extraction.
+  <!-- Feature Highlights -->
+  <div style="margin-top: 3rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+    <div class="feature-card">
+      <div class="feature-icon-wrap">🔍</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem;">YouTube Search</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+        Search millions of tracks instantly with video embed checks and preview player.
       </p>
     </div>
 
-    <div class="card" style="padding: 1.25rem;">
-      <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🗳️</div>
-      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">2. Vote &amp; Fair Play</h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">
-        Vote up favorites. Fair-turn cooldowns prevent playlist monopolization.
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3); color: var(--emerald);">🗳️</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem;">Fair-Play Voting</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+        Community upvotes prioritize popular tracks. Cooldowns prevent playlist hijacking.
       </p>
     </div>
 
-    <div class="card" style="padding: 1.25rem;">
-      <div style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔊</div>
-      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;">3. Office Speaker</h3>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">
-        Connect one PC to the speaker in Player Mode. Songs stream seamlessly.
+    <div class="feature-card">
+      <div class="feature-icon-wrap" style="background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.3); color: var(--cyan);">🔊</div>
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem;">Dedicated Player</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">
+        One machine connects to the office sound system. Everyone else controls the queue.
       </p>
     </div>
   </div>

@@ -173,9 +173,10 @@
             ? `<button class="btn btn-icon btn-sm remove-song-btn" data-id="${item.id}" title="Remove song">✕</button>`
             : "";
 
+          const rankBadge = item.rank === 1 ? "🥇" : item.rank === 2 ? "🥈" : item.rank === 3 ? "🥉" : `#${item.rank}`;
           html += `
             <div class="queue-item" data-id="${item.id}">
-              <div class="queue-rank">#${item.rank}</div>
+              <div class="queue-rank-badge">${rankBadge}</div>
               <img src="${escapeHtml(item.thumbnail_url)}" alt="thumb" class="queue-thumb" />
               <div class="queue-details">
                 <div class="queue-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</div>
@@ -444,8 +445,29 @@
     });
   }
 
+  // Genre chips instant search
+  document.querySelectorAll(".genre-chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const query = chip.getAttribute("data-query");
+      if (query && searchInput) {
+        searchInput.value = query;
+        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+        searchInput.focus();
+      }
+    });
+  });
+
+  // Keyboard shortcut '/' to jump to search
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && document.activeElement !== searchInput && !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)) {
+      e.preventDefault();
+      if (searchInput) searchInput.focus();
+    }
+  });
+
   // Start polling on load
   if (roomCode) {
     pollRoomState();
   }
 })();
+

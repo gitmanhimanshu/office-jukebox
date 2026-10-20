@@ -7,15 +7,23 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>{% block title %}Office Jukebox - Shared Office Music Queue{% endblock %}</title>
   {% block extra_meta %}{% endblock %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📻</text></svg>">
 </head>
 <body>
   <header class="app-header">
     <div class="header-container">
       <a href="{% url 'welcome' %}" class="brand">
-        <span class="brand-icon">📻</span>
-        <span class="brand-title">Office Jukebox</span>
+        <div class="brand-icon-wrap">
+          📻
+        </div>
+        <div class="brand-text-block">
+          <span class="brand-title">Office Jukebox</span>
+          <span class="brand-subtitle">Shared Music Queue</span>
+        </div>
       </a>
 
       <div class="header-meta">
@@ -60,9 +68,9 @@
 
   <!-- Flash Messages -->
   {% if messages %}
-    <div style="max-width: 1380px; margin: 1rem auto 0; padding: 0 1.5rem;">
+    <div style="max-width: 1400px; margin: 1.25rem auto 0; padding: 0 1.75rem;">
       {% for message in messages %}
-        <div class="toast {{ message.tags }}" style="position: static; margin-bottom: 0.5rem; max-width: 100%;">
+        <div class="toast {{ message.tags }}" style="position: static; margin-bottom: 0.6rem; max-width: 100%;">
           <span>{{ message }}</span>
         </div>
       {% endfor %}
@@ -73,7 +81,7 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="app-footer">
+  <footer class="app-footer" style="border-top: 1px solid var(--border-subtle); padding: 1.5rem; text-align: center; color: var(--text-dim); font-size: 0.85rem; margin-top: auto;">
     <p>Office Jukebox &bull; Fair-play office music democracy &bull; Powered by YouTube Data API &amp; Django</p>
   </footer>
 

@@ -15,8 +15,8 @@
     <!-- Search Card -->
     <div class="card" style="margin-bottom: 1.5rem;">
       <div class="card-header">
-        <h2 class="card-title">🔍 Search &amp; Add Music</h2>
-        <span id="search-spinner" style="display: none; font-size: 0.85rem; color: var(--primary);">
+        <h2 class="card-title">🔍 Search &amp; Add Songs</h2>
+        <span id="search-spinner" style="display: none; font-size: 0.85rem; color: var(--primary-light); font-weight: 600;">
           Searching...
         </span>
       </div>
@@ -28,30 +28,52 @@
             type="text"
             id="search-input"
             class="form-control search-input"
-            placeholder="Search song title, artist, or paste YouTube URL..."
+            placeholder="Search song title, artist, or paste YouTube link... (Press '/' to focus)"
             autocomplete="off"
           />
+        </div>
+
+        <!-- Quick Genre / Mood Suggestion Chips -->
+        <div class="genre-chips-wrap">
+          <button type="button" class="genre-chip" data-query="Lo-Fi Hip Hop Beats">☕ Lo-Fi Chill</button>
+          <button type="button" class="genre-chip" data-query="Synthwave Retro Electro">⚡ Synthwave</button>
+          <button type="button" class="genre-chip" data-query="Acoustic Instrumental Chill">🎸 Acoustic</button>
+          <button type="button" class="genre-chip" data-query="Deep Focus Coding Music">🧠 Deep Focus</button>
+          <button type="button" class="genre-chip" data-query="Top Global Pop Hits 2026">✨ Pop Hits</button>
+          <button type="button" class="genre-chip" data-query="Classic Rock Anthems">🔥 Classic Rock</button>
+          <button type="button" class="genre-chip" data-query="Bollywood Melodies">🌸 Bollywood</button>
         </div>
       </div>
 
       <!-- Search Results Container -->
       <div id="search-results" class="search-results">
         <div class="empty-state" style="padding: 1.5rem 1rem;">
-          <p>Type a song title or artist above to find tracks on YouTube.</p>
+          <p>Type a song title or click a genre above to find songs on YouTube.</p>
         </div>
       </div>
     </div>
 
     <!-- Fair-Play Room Policy Card -->
-    <div class="card" style="background: var(--bg-surface-alt);">
-      <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
+    <div class="card" style="background: rgba(17, 24, 42, 0.55);">
+      <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
         ⚖️ Active Fair-Play Rules
       </h3>
-      <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;">
-        <div>&bull; Max active songs per employee: <strong>{{ settings.max_active_songs_per_user }}</strong></div>
-        <div>&bull; Queue cooldown between requests: <strong>{{ settings.user_song_cooldown_seconds }}s</strong></div>
-        <div>&bull; Fair-turn mode: <strong>{% if settings.fair_turn_mode %}Enabled (Tied votes prioritize users with fewer recent plays){% else %}Standard FIFO on tied votes{% endif %}</strong></div>
-        <div>&bull; One vote per person per track (click vote again to retract).</div>
+      <div style="font-size: 0.84rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+          <span>Max active songs per colleague:</span>
+          <strong style="color: #fff;">{{ settings.max_active_songs_per_user }} tracks</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+          <span>Queue addition cooldown:</span>
+          <strong style="color: #fff;">{{ settings.user_song_cooldown_seconds }} seconds</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4rem;">
+          <span>Fair-turn mode:</span>
+          <strong style="color: var(--emerald);">{% if settings.fair_turn_mode %}Enabled (Tied votes prioritize users with fewer plays){% else %}Standard FIFO{% endif %}</strong>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.2rem;">
+          💡 Click a song's vote button to upvote; click again anytime to retract your vote.
+        </div>
       </div>
     </div>
   </div>
@@ -60,10 +82,11 @@
   <div>
     <!-- Currently Playing Card -->
     <div class="card now-playing-card" style="margin-bottom: 1.5rem;">
-      <div class="card-header" style="border-bottom-color: rgba(99, 102, 241, 0.2);">
+      <div class="card-header" style="border-bottom-color: rgba(99, 102, 241, 0.25);">
         <h2 class="card-title">
           <span>🎧 Now Playing</span>
           <div class="equalizer" id="now-playing-equalizer" style="display: none;">
+            <div class="eq-bar"></div>
             <div class="eq-bar"></div>
             <div class="eq-bar"></div>
             <div class="eq-bar"></div>
@@ -90,10 +113,10 @@
       </div>
 
       <!-- Idle Track Empty State -->
-      <div id="now-playing-empty" class="empty-state" style="padding: 1rem 0;">
+      <div id="now-playing-empty" class="empty-state" style="padding: 1.5rem 0;">
         <div class="empty-icon">📻</div>
-        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Office Speaker is Idle</h3>
-        <p style="font-size: 0.85rem;">Add a song from the search bar to start the music!</p>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">Office Speaker is Idle</h3>
+        <p style="font-size: 0.88rem;">Add a song from the search bar to start the music!</p>
       </div>
     </div>
 
@@ -102,11 +125,13 @@
       <div class="card-header">
         <h2 class="card-title">
           <span>📋 Shared Queue</span>
-          <span class="pill-badge" id="queue-count-badge" style="font-size: 0.75rem;">
+          <span class="pill-badge active" id="queue-count-badge" style="font-size: 0.78rem;">
             0 in queue
           </span>
         </h2>
-        <span style="font-size: 0.75rem; color: var(--text-dim);">Live Sync</span>
+        <span style="font-size: 0.78rem; color: var(--text-dim); display: flex; align-items: center; gap: 0.35rem;">
+          <span class="status-dot online" style="width: 6px; height: 6px;"></span> Live Sync
+        </span>
       </div>
 
       <div id="queue-items-container" class="queue-list">
@@ -126,7 +151,7 @@
 <div id="preview-modal" class="modal-overlay">
   <div class="modal-content">
     <div class="modal-header">
-      <h3 style="font-size: 1rem; font-weight: 700;">Video Preview</h3>
+      <h3 style="font-size: 1.05rem; font-weight: 700; font-family: var(--font-heading);">Video Preview</h3>
       <button id="preview-close-btn" class="btn btn-icon btn-sm" title="Close preview">✕</button>
     </div>
     <div class="modal-body" style="padding: 0;">
